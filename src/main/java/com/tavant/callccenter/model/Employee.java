@@ -43,7 +43,7 @@ public class Employee {
 	}
 
 	public void receiveAndHandleCall(Call call, CallConfig callConfig) {
-		saveEmpDetail(call);
+		//saveEmpDetail(call);
 		currentCall = call;
 		handler = new CallHandler(callConfig);
 		int callTimeInMins = new Random().nextInt(15);
@@ -74,18 +74,17 @@ public class Employee {
 
 	private void saveEmpDetail(Call call) {
 		Employee emp = call.getHandler();
-		EmployeeDetail empDetails = null;
 		String name = emp.getName();
-		Optional<EmployeeDetail> empDetail = employeeDetailRepo.findByName(name);
-		if (empDetail.isPresent()) {
-			empDetails = empDetail.get();
-			empDetails.setCallsAttended(empDetails.getCallsAttended() + 1);
+		EmployeeDetail empDetail = employeeDetailRepo.findByName(name);
+		if (empDetail != null) {
+			
+			empDetail.setCallsAttended(empDetail.getCallsAttended() + 1);
 		} else {
-			empDetails = new EmployeeDetail();
-			empDetails.setName(emp.getName());
+			empDetail = new EmployeeDetail();
+			empDetail.setName(emp.getName());
 		}
 
-		employeeDetailRepo.save(empDetails);
+		employeeDetailRepo.save(empDetail);
 	}
 
 	public void callFinished() {
