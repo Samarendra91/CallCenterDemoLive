@@ -1,11 +1,15 @@
 package com.tavant.callccenter.model;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
-public class CallDetail {
+public class EmployeeDetail {
+	
 	@Id
 	@GeneratedValue
 	private int id;
@@ -14,6 +18,9 @@ public class CallDetail {
 	private int callsAttended;
 	private int resolved;
 	private int escalated;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "call_center_id")
+	private CallCenterDetail callCenter;
 
 	public int getId() {
 		return id;

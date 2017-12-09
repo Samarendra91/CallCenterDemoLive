@@ -14,12 +14,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.tavant.callccenter.repository.EmployeeDetailRepository;
 import com.tavant.callccenter.sevice.Call;
 import com.tavant.callccenter.sevice.CallHandler;
 
 public class Employee {
 
+	@Autowired
+	private EmployeeDetailRepository callDetailRepository;
+
 	protected Call currentCall = null;
+
 	protected Designation rank;
 
 	private List<String> mobileNumbers = addMobileNumbers();
