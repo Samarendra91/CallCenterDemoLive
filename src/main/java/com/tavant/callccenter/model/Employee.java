@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.tavant.callccenter.repository.EmployeeDetailRepository;
 import com.tavant.callccenter.sevice.Call;
+import com.tavant.callccenter.sevice.CallConfig;
 import com.tavant.callccenter.sevice.CallHandler;
 
 public class Employee {
@@ -30,7 +31,6 @@ public class Employee {
 
 	private List<String> mobileNumbers = addMobileNumbers();
 
-	@Autowired
 	private CallHandler handler;
 
 	private Map<Employee, CallHandler> employeeHandlerMap = new HashMap<>();
@@ -39,8 +39,9 @@ public class Employee {
 
 	}
 
-	public void receiveAndHandleCall(Call call) {
+	public void receiveAndHandleCall(Call call, CallConfig callConfig ) {
 		currentCall = call;
+		handler = new CallHandler(callConfig);
 		int callTimeInMins = new Random().nextInt(15);
 		employeeHandlerMap.put(call.getHandler(), handler);
 		// if (mobileNumbers.contains(call.getCaller().getMobile())) {

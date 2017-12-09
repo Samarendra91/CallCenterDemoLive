@@ -20,8 +20,6 @@ public class CallHandler implements Callable<Call> {
 
 	private Caller caller;
 
-	private boolean isHandled;
-
 	public Caller getCaller() {
 		return caller;
 	}
@@ -108,7 +106,7 @@ public class CallHandler implements Callable<Call> {
 		if (handler.isPresent()) {
 			Employee executive = handler.get();
 			call.setHandler(executive);
-			executive.receiveAndHandleCall(call);
+			executive.receiveAndHandleCall(call,callConfig);
 		} else {
 			call.reply("please wait for the next free employee");
 			callConfig.callQueues.get(call.getEmpType().getValue()).add(call);

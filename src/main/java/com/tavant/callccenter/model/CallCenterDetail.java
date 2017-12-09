@@ -10,9 +10,11 @@ import javax.persistence.OneToMany;
 
 @Entity
 public class CallCenterDetail {
+
 	@Id
 	@GeneratedValue
 	private int id;
+	private String name;
 	private int number_of_calls;
 	private int resolved;
 	private int unresolved;
@@ -25,6 +27,14 @@ public class CallCenterDetail {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getNumber_of_calls() {
