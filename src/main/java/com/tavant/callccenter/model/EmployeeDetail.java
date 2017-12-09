@@ -9,11 +9,11 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class EmployeeDetail {
-	
+
 	@Id
 	@GeneratedValue
 	private int id;
-	private String empName;
+	private String name;
 	private int timeTakenInMinutes;
 	private int callsAttended;
 	private int resolved;
@@ -30,12 +30,20 @@ public class EmployeeDetail {
 		this.id = id;
 	}
 
-	public String getEmpName() {
-		return empName;
+	public String getName() {
+		return name;
 	}
 
-	public void setEmpName(String empName) {
-		this.empName = empName;
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public CallCenterDetail getCallCenter() {
+		return callCenter;
+	}
+
+	public void setCallCenter(CallCenterDetail callCenter) {
+		this.callCenter = callCenter;
 	}
 
 	public int getTimeTakenInMinutes() {
