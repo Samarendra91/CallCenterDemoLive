@@ -14,115 +14,110 @@ import com.tavant.callccenter.model.Employee;
 @Component
 public class CallHandler implements Callable<Call> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(Call.class);
+	private static final Logger LOG = LoggerFactory.getLogger(Call.class);
 
-  private CallConfig callConfig;
+	private CallConfig callConfig;
 
-  private Caller caller;
+	private Caller caller;
 
-  private boolean isHandled;
-  
-  public Caller getCaller() {
-    return caller;
-  }
+	private boolean isHandled;
 
-  public void setCaller(Caller caller) {
-    this.caller = caller;
-  }
+	public Caller getCaller() {
+		return caller;
+	}
 
-  /**
-   * @param callConfig
-   */
-  @Autowired
-  public CallHandler(CallConfig callConfig) {
-    this.callConfig = callConfig;
-  }
+	public void setCaller(Caller caller) {
+		this.caller = caller;
+	}
 
-  @Override
-  public Call call() throws Exception {
-    LOG.info(Thread.currentThread().getName());
-    // LOG.info(caller.getMobile()+" "+caller.getName());
-    Call call = new Call(caller);
-    dispatchCall(call);
-    // return the thread name executing this callable task
-    return call;
-  }
+	/**
+	 * @param callConfig
+	 */
+	@Autowired
+	public CallHandler(CallConfig callConfig) {
+		this.callConfig = callConfig;
+	}
 
-  public boolean assignCall(Employee emp) {
-    // get the highest rank this employee can serve
-    for (int rank = emp.getRank().getValue(); rank >= 0; rank--) {
-      ArrayBlockingQueue<Call> queue = callConfig.callQueues.get(rank);
+	@Override
+	public Call call() throws Exception {
+		LOG.info(Thread.currentThread().getName() + "  " + caller.getMobile() + " " + caller.getName());
+		// LOG.info(caller.getMobile()+" "+caller.getName());
+		Call call = new Call(caller);
+		dispatchCall(call);
+		// return the thread name executing this callable task
+		return call;
+	}
 
-      if (queue.size() > 0) {
-        Call call = null;
-        try {
-          call = queue.take();
-        } catch (InterruptedException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-        }
-        if (call != null) {
-          // receive call
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+	public boolean assignCall(Employee emp) {
+		// get the highest rank this employee can serve
+		for (int rank = emp.getRank().getValue(); rank >= 0; rank--) {
+			ArrayBlockingQueue<Call> queue = callConfig.callQueues.get(rank);
 
-  public Optional<Employee> setHandlerForCall(Call call) {
+			if (queue.size() > 0) {
+				Call call = null;
+				try {
+					call = queue.take();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				if (call != null) {
+					// receive call
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-    switch (call.getEmpType().getValue()) {
+	public Optional<Employee> setHandlerForCall(Call call) {
 
-      /* check all junior executives */
-      case 0:
-        for (Employee junior : callConfig.employeeLevels.get(0)) {
-          if (junior.isFree()) {
-            return Optional.of(junior);
-          }
-        }
+		switch (call.getEmpType().getValue()) {
 
-        /* check all senior executives */
-      case 1:
-        for (Employee senior : callConfig.employeeLevels.get(1)) {
-          if (senior.isFree())
-            return Optional.of(senior);
-        }
+		/* check all junior executives */
+		case 0:
+			for (Employee junior : callConfig.employeeLevels.get(0)) {
+				if (junior.isFree()) {
+					return Optional.of(junior);
+				}
+			}
 
-        /* check all managers */
-      case 2:
-        for (Employee manager : callConfig.employeeLevels.get(2)) {
-          if (manager.isFree())
-            return Optional.of(manager);
-        }
+			/* check all senior executives */
+		case 1:
+			for (Employee senior : callConfig.employeeLevels.get(1)) {
+				if (senior.isFree())
+					return Optional.of(senior);
+			}
 
-        // No one is free
-      default:
-        return Optional.empty();
-    }
-  }
+			/* check all managers */
+		case 2:
+			for (Employee manager : callConfig.employeeLevels.get(2)) {
+				if (manager.isFree())
+					return Optional.of(manager);
+			}
 
-  public void dispatchCall(Call call) {
-    Optional<Employee> handler = setHandlerForCall(call);
+			// No one is free
+		default:
+			return Optional.empty();
+		}
+	}
 
-    if (handler.isPresent()) {
-      Employee executive = handler.get();
-      call.setHandler(executive);
-      isHandled = executive.receiveAndHandleCall(call);
-      if (isHandled) {
-        executive.assignNewCall();
-      } else {
-        executive.escalateAndReassign(executive);
-      }
-    } else {
-      call.reply("please wait for the next free employee");
-      callConfig.callQueues.get(call.getEmpType().getValue()).add(call);
-    }
-  }
+	public void dispatchCall(Call call) {
+		Optional<Employee> handler = setHandlerForCall(call);
 
-  /*
-   * public Call dispatchCaller(Caller caller) { Call call = new Call(caller); call =
-   * dispatchCall(call); return call; }
-   */
+		if (handler.isPresent()) {
+			Employee executive = handler.get();
+			call.setHandler(executive);
+			executive.receiveAndHandleCall(call);
+		} else {
+			call.reply("please wait for the next free employee");
+			callConfig.callQueues.get(call.getEmpType().getValue()).add(call);
+		}
+	}
+
+	/*
+	 * public Call dispatchCaller(Caller caller) { Call call = new Call(caller);
+	 * call = dispatchCall(call); return call; }
+	 */
 
 }

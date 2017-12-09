@@ -28,36 +28,68 @@ import com.tavant.callccenter.sevice.CallHandler;
  */
 @RestController
 public class CallHandleController {
-  private static final Logger LOG = LoggerFactory.getLogger(Call.class);
-  
-  @Autowired
-  private CallConfig callConfig;
-  
-  @RequestMapping(value = "/calls", method = RequestMethod.POST ,consumes="application/json", produces = "application/json")
-  public List<Call> handleCall(@RequestBody List<Caller> callers) {
-    
-    List<Call> responseCall = new ArrayList<>();
-    ExecutorService executor = Executors.newFixedThreadPool(10);
-    List<Future<Call>> list = new ArrayList<Future<Call>>();
-    for(Caller caller : callers) {
-      CallHandler handler = new CallHandler(callConfig);
-      handler.setCaller(caller);
-      Callable<Call> callable = handler;
-      Future<Call> future = executor.submit(callable);
-      list.add(future);
-    }
-    
-    
-    for(Future<Call> fut : list){
-      try {
-        
-        Call call = fut.get();
-        responseCall.add(call);
-      }catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    
-    return responseCall;
-  }
+	private static final Logger LOG = LoggerFactory.getLogger(Call.class);
+
+	@Autowired
+	private CallConfig callConfig;
+
+	@RequestMapping(value = "/calls", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	public List<Call> handleCall(@RequestBody List<Caller> callers) {
+
+		List<Call> responseCall = new ArrayList<>();
+		ExecutorService executor = Executors.newFixedThreadPool(10);
+		List<Future<Call>> list = new ArrayList<Future<Call>>();
+		for (Caller caller : callers) {
+			CallHandler handler = new CallHandler(callConfig);
+			handler.setCaller(caller);
+			Callable<Call> callable = handler;
+			Future<Call> future = executor.submit(callable);
+			list.add(future);
+		}
+
+		for (Future<Call> fut : list) {
+			try {
+
+				Call call = fut.get();
+				responseCall.add(call);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return responseCall;
+	}
+
+	@RequestMapping(value = "/generate")
+	public List<Call> callgenerator() {
+		
+		int totalCall = 4;
+		List<Call> responseCall = new ArrayList<>();
+		ExecutorService executor = Executors.newFixedThreadPool(10);
+		List<Future<Call>> list = new ArrayList<Future<Call>>();
+		for (int i = 1; i < totalCall; i++) {
+
+			Caller caller = new Caller();
+			caller.setMobile("mobile" + i);
+			caller.setName("name" + i);
+			
+			CallHandler handler = new CallHandler(callConfig);
+			handler.setCaller(caller);
+			Callable<Call> callable = handler;
+			Future<Call> future = executor.submit(callable);
+			list.add(future);
+		}
+
+		for (Future<Call> fut : list) {
+			try {
+
+				Call call = fut.get();
+				responseCall.add(call);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return responseCall;
+	}
 }
